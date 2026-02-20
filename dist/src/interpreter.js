@@ -1,5 +1,12 @@
-import { BinaryExpr, FunctionStmt } from './ast.js';
+import { BinaryExpr, FunctionStmt, ReturnStmt } from './ast.js';
 import { TokenKind } from './token.js';
+class ReturnValue extends Error {
+    value;
+    constructor(value) {
+        super();
+        this.value = value;
+    }
+}
 export class Interpreter {
     environment = new Map();
     interpret(statements) {
@@ -50,6 +57,10 @@ export class Interpreter {
     }
     visitExpressionStmt(stmt) {
         this.evaluate(stmt.expression);
+    }
+    visitReturnStmt(stmt) {
+        const value = stmt.value !== null ? this.evaluate(stmt.value) : null;
+        throw new ReturnValue(value);
     }
     visitLiteralExpr(expr) {
         if (typeof expr.value === 'string' && expr.value.startsWith('"')) {
@@ -108,8 +119,18 @@ export class Interpreter {
             this.environment.set(func.params[i].lexeme, value);
         }
         // Execute function body
-        for (const stmt of func.body) {
-            this.execute(stmt);
+        try {
+            for (const stmt of func.body) {
+                this.execute(stmt);
+            }
+        }
+        catch (returnValue) {
+            if (returnValue instanceof ReturnValue) {
+                // Restore previous environment before returning
+                this.environment = prevEnvironment;
+                return returnValue.value;
+            }
+            throw returnValue;
         }
         // Restore previous environment
         this.environment = prevEnvironment;

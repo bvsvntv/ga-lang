@@ -21,6 +21,7 @@ export interface StmtVisitor<T> {
   visitFunctionStmt(stmt: FunctionStmt): T;
   visitBlockStmt(stmt: BlockStmt): T;
   visitExpressionStmt(stmt: ExpressionStmt): T;
+  visitReturnStmt(stmt: ReturnStmt): T;
 }
 
 export class VariableExpr implements Expr {
@@ -140,5 +141,17 @@ export class ExpressionStmt implements Stmt {
 
   accept<T>(visitor: StmtVisitor<T>): T {
     return visitor.visitExpressionStmt(this);
+  }
+}
+
+export class ReturnStmt implements Stmt {
+  value: Expr | null;
+
+  constructor(value: Expr | null) {
+    this.value = value;
+  }
+
+  accept<T>(visitor: StmtVisitor<T>): T {
+    return visitor.visitReturnStmt(this);
   }
 }

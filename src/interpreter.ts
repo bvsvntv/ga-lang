@@ -1,6 +1,7 @@
 import {
   BinaryExpr,
   FunctionStmt,
+  ReturnStmt,
   type BlockStmt,
   type CallExpr,
   type ExpressionStmt,
@@ -14,6 +15,14 @@ import {
   type VarStmt
 } from './ast.js';
 import { TokenKind } from './token.js';
+
+class ReturnValue extends Error {
+  value: any;
+  constructor(value: any) {
+    super();
+    this.value = value;
+  }
+}
 
 export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
   private environment: Map<string, any> = new Map();
@@ -75,6 +84,11 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
 
   visitExpressionStmt(stmt: ExpressionStmt): void {
     this.evaluate(stmt.expression);
+  }
+
+  visitReturnStmt(stmt: ReturnStmt): void {
+    const value = stmt.value !== null ? this.evaluate(stmt.value) : null;
+    throw new ReturnValue(value);
   }
 
   visitLiteralExpr(expr: LiteralExpr): any {
@@ -145,8 +159,17 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     }
 
     // Execute function body
-    for (const stmt of func.body) {
-      this.execute(stmt);
+    try {
+      for (const stmt of func.body) {
+        this.execute(stmt);
+      }
+    } catch (returnValue) {
+      if (returnValue instanceof ReturnValue) {
+        // Restore previous environment before returning
+        this.environment = prevEnvironment;
+        return returnValue.value;
+      }
+      throw returnValue;
     }
 
     // Restore previous environment

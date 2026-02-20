@@ -91,3 +91,12 @@ export class ExpressionStmt {
         return visitor.visitExpressionStmt(this);
     }
 }
+export class ReturnStmt {
+    value;
+    constructor(value) {
+        this.value = value;
+    }
+    accept(visitor) {
+        return visitor.visitReturnStmt(this);
+    }
+}

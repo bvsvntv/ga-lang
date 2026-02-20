@@ -140,4 +140,37 @@ describe('Interpreter', () => {
     assert.equal(outputs.length, 1);
     assert.equal(outputs[0], 'नमस्ते');
   });
+
+  test('function returns value', () => {
+    const source = `कार्य जोड(क, ख) {
+  फिर्ता क + ख
+}
+मानौ परिणाम = जोड(२, ३)
+छाप(परिणाम)`;
+    const outputs = runSource(source);
+    assert.equal(outputs.length, 1);
+    assert.equal(outputs[0], '५');
+  });
+
+  test('function returns expression result', () => {
+    const source = `कार्य गुणा(क, ख) {
+  फिर्ता क * ख + १०
+}
+मानौ परिणाम = गुणा(३, ४)
+छाप(परिणाम)`;
+    const outputs = runSource(source);
+    assert.equal(outputs.length, 1);
+    assert.equal(outputs[0], '२२');
+  });
+
+  test('function returns string', () => {
+    const source = `कार्य नमस्कार() {
+  फिर्ता "नमस्ते संसार"
+}
+मानौ सन्देश = नमस्कार()
+छाप(सन्देश)`;
+    const outputs = runSource(source);
+    assert.equal(outputs.length, 1);
+    assert.equal(outputs[0], 'नमस्ते संसार');
+  });
 });

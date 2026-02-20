@@ -1,4 +1,4 @@
-import { BinaryExpr, CallExpr, ExpressionStmt, FunctionStmt, LiteralExpr, PrintStmt, VarStmt, VariableExpr } from './ast.js';
+import { BinaryExpr, CallExpr, ExpressionStmt, FunctionStmt, LiteralExpr, PrintStmt, ReturnStmt, VarStmt, VariableExpr } from './ast.js';
 import { TokenKind } from './token.js';
 export class Parser {
     tokens;
@@ -28,7 +28,18 @@ export class Parser {
         if (this.match(TokenKind.Function)) {
             return this.parseFunctionStmt();
         }
+        if (this.match(TokenKind.Return)) {
+            return this.parseReturnStmt();
+        }
         return this.parseExpressionStmt();
+    }
+    parseReturnStmt() {
+        let value = null;
+        // Check if there's a value to return (not just "फिर्ता" alone)
+        if (!this.check(TokenKind.CloseCurly) && !this.isAtEnd()) {
+            value = this.parseExpression();
+        }
+        return new ReturnStmt(value);
     }
     parseExpressionStmt() {
         const expr = this.parseExpression();

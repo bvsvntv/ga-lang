@@ -5,6 +5,7 @@ import {
   FunctionStmt,
   LiteralExpr,
   PrintStmt,
+  ReturnStmt,
   VarStmt,
   VariableExpr,
   type Expr,
@@ -47,7 +48,20 @@ export class Parser {
       return this.parseFunctionStmt();
     }
 
+    if (this.match(TokenKind.Return)) {
+      return this.parseReturnStmt();
+    }
+
     return this.parseExpressionStmt();
+  }
+
+  private parseReturnStmt(): ReturnStmt {
+    let value: Expr | null = null;
+    // Check if there's a value to return (not just "फिर्ता" alone)
+    if (!this.check(TokenKind.CloseCurly) && !this.isAtEnd()) {
+      value = this.parseExpression();
+    }
+    return new ReturnStmt(value);
   }
 
   private parseExpressionStmt(): ExpressionStmt {
