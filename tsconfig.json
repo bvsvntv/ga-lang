@@ -9,6 +9,7 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
+    "declaration": true,
 
     /* Strictness */
     "strict": true,
@@ -20,6 +21,6 @@
     "rootDir": ".",
     "outDir": "./dist"
   },
-  "include": ["src/**/*.ts", "tests/**/*.test.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

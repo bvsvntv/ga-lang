@@ -12,7 +12,8 @@
     "prettier:fix": "prettier --write \"./**/*.{js,ts,json}\"",
     "clean": "rm -rf dist",
     "build": "pnpm run clean && tsc",
-    "test": "pnpm run build && node --test ./dist/tests/**/*.js",
+    "build:tests": "tsc -p tsconfig.test.json",
+    "test": "pnpm run build && pnpm run build:tests && node --test ./dist/tests/**/*.js",
     "ga": "pnpm run build && node dist/src/main.js"
   },
   "repository": {
