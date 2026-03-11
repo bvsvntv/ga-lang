@@ -9,20 +9,36 @@ class ReturnValue extends Error {
 }
 export class Interpreter {
     environment = new Map();
+    outputs = [];
+    // CLI entry
     interpret(statements) {
-        for (const statement of statements) {
-            this.execute(statement);
+        this.outputs = [];
+        this.run(statements);
+        for (const line of this.outputs) {
+            console.log(line);
         }
     }
-    execute(stmt) {
-        stmt.accept(this);
+    // Browser entry
+    interpretForBrowser(statements) {
+        this.outputs = [];
+        this.run(statements);
+        return this.outputs.join('\n');
     }
     /*
      * Process print statement
      */
     visitPrintStmt(stmt) {
         const value = this.evaluate(stmt.expression);
-        console.log(this.toDevanagariString(value));
+        const output = this.toDevanagariString(value);
+        this.outputs.push(output);
+    }
+    run(statements) {
+        for (const statement of statements) {
+            this.execute(statement);
+        }
+    }
+    execute(stmt) {
+        stmt.accept(this);
     }
     toDevanagariString(value) {
         if (typeof value === 'number') {

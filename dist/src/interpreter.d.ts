@@ -1,9 +1,12 @@
 import { BinaryExpr, FunctionStmt, ReturnStmt, type BlockStmt, type CallExpr, type ExpressionStmt, type ExprVisitor, type LiteralExpr, type PrintStmt, type Stmt, type StmtVisitor, type VariableExpr, type VarStmt } from './ast.js';
 export declare class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     private environment;
+    private outputs;
     interpret(statements: Stmt[]): void;
-    private execute;
+    interpretForBrowser(statements: Stmt[]): string;
     visitPrintStmt(stmt: PrintStmt): void;
+    private run;
+    private execute;
     private toDevanagariString;
     private numberToDevanagari;
     visitVarStmt(stmt: VarStmt): void;

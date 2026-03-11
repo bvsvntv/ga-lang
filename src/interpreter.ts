@@ -26,15 +26,23 @@ class ReturnValue extends Error {
 
 export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
   private environment: Map<string, any> = new Map();
+  private outputs: string[] = [];
 
+  // CLI entry
   interpret(statements: Stmt[]): void {
-    for (const statement of statements) {
-      this.execute(statement);
+    this.outputs = [];
+    this.run(statements);
+
+    for (const line of this.outputs) {
+      console.log(line);
     }
   }
 
-  private execute(stmt: Stmt): void {
-    stmt.accept(this);
+  // Browser entry
+  interpretForBrowser(statements: Stmt[]): string {
+    this.outputs = [];
+    this.run(statements);
+    return this.outputs.join('\n');
   }
 
   /*
@@ -42,7 +50,18 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
    */
   visitPrintStmt(stmt: PrintStmt): void {
     const value = this.evaluate(stmt.expression);
-    console.log(this.toDevanagariString(value));
+    const output = this.toDevanagariString(value);
+    this.outputs.push(output);
+  }
+
+  private run(statements: Stmt[]): void {
+    for (const statement of statements) {
+      this.execute(statement);
+    }
+  }
+
+  private execute(stmt: Stmt): void {
+    stmt.accept(this);
   }
 
   private toDevanagariString(value: any): string {
