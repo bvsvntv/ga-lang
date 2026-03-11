@@ -3,8 +3,10 @@
   "version": "1.2.4",
   "description": "An interpreted toy programming language",
   "type": "module",
-  "main": "dist/src/main.js",
-  "types": "dist/src/main.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "module": "dist/src/index.js",
+  "browser": "dist/browser/index.js",
   "bin": {
     "ga": "./bin/ga.js"
   },
@@ -13,8 +15,10 @@
     "prettier:fix": "prettier --write \"./**/*.{js,ts,json}\"",
     "clean": "rm -rf dist",
     "build": "pnpm run clean && tsc",
+    "build:browser": "esbuild src/index.ts --bundle --format=esm --outfile=dist/browser/index.js --platform=browser",
+    "build:all": "pnpm run build && pnpm run build:browser",
     "build:tests": "tsc -p tsconfig.test.json",
-    "test": "pnpm run build && pnpm run build:tests && node --test ./dist/tests/**/*.js",
+    "test": "pnpm run build:all && pnpm run build:tests && node --test ./dist/tests/**/*.js",
     "ga": "pnpm run build && node dist/src/main.js"
   },
   "repository": {
@@ -39,7 +43,10 @@
     "pnpm": ">=10.x.x"
   },
   "exports": {
-    ".": "./dist/src/main.js"
+    "types": "./dist/src/index.d.ts",
+    "node": "./dist/src/index.js",
+    "browser": "./dist/browser/index.js",
+    "default": "./dist/src/index.js"
   },
   "devEngines": {
     "runtime": {
@@ -49,6 +56,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
+    "esbuild": "^0.27.3",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   }
