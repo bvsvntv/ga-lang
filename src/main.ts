@@ -36,3 +36,6 @@ function main(): void {
 }
 
 main();
+
+// Export Lexer, Parser, and Interpreter
+export { Lexer, Parser, Interpreter };

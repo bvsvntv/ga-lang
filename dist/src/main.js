@@ -28,3 +28,5 @@ function main() {
     }
 }
 main();
+// Export Lexer, Parser, and Interpreter
+export { Lexer, Parser, Interpreter };

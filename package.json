@@ -4,6 +4,7 @@
   "description": "An interpreted toy programming language",
   "type": "module",
   "main": "dist/main.js",
+  "types": "dist/src/main.d.ts",
   "bin": {
     "ga": "./bin/ga.js"
   },
