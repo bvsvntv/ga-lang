@@ -43,8 +43,9 @@
     "pnpm": ">=10.x.x"
   },
   "exports": {
+    "main": "./dist/src/index.js",
+    "module": "./dist/src/index.js",
     "types": "./dist/src/index.d.ts",
-    "node": "./dist/src/index.js",
     "browser": "./dist/browser/index.js",
     "default": "./dist/src/index.js"
   },
