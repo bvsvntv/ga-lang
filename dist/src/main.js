@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { Lexer } from './lexer.js';
 import { Parser } from './parser.js';
 import { Interpreter } from './interpreter.js';
+// Get filename from command line arguments
 function getFileNameFromArgs(args) {
     if (args.length <= 0) {
         console.log('> No input files.');
@@ -21,6 +22,7 @@ function execFile(path) {
     const interpreter = new Interpreter();
     interpreter.interpret(stmts);
 }
+// Main entry point
 function main() {
     const fileName = getFileNameFromArgs(process.argv.slice(2));
     if (fileName !== null) {

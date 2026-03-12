@@ -2,6 +2,10 @@ import { BinaryExpr, FunctionStmt, ReturnStmt, type BlockStmt, type CallExpr, ty
 export declare class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     private environment;
     private outputs;
+    /**
+     * CLI entry
+     *
+     */
     interpret(statements: Stmt[]): void;
     interpretForBrowser(statements: Stmt[]): string;
     visitPrintStmt(stmt: PrintStmt): void;

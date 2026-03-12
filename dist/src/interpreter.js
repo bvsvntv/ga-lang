@@ -10,7 +10,10 @@ class ReturnValue extends Error {
 export class Interpreter {
     environment = new Map();
     outputs = [];
-    // CLI entry
+    /**
+     * CLI entry
+     *
+     */
     interpret(statements) {
         this.outputs = [];
         this.run(statements);
@@ -32,20 +35,24 @@ export class Interpreter {
         const output = this.toDevanagariString(value);
         this.outputs.push(output);
     }
+    // Run statements
     run(statements) {
         for (const statement of statements) {
             this.execute(statement);
         }
     }
+    // Execute a statement
     execute(stmt) {
         stmt.accept(this);
     }
+    // Convert value to Devanagari string
     toDevanagariString(value) {
         if (typeof value === 'number') {
             return this.numberToDevanagari(value);
         }
         return String(value);
     }
+    // Convert number to Devanagari digits
     numberToDevanagari(num) {
         const devanagariZero = 0x0966;
         return num
@@ -59,25 +66,31 @@ export class Interpreter {
         })
             .join('');
     }
+    // Handle variable statement
     visitVarStmt(stmt) {
         const value = stmt.initializer !== null ? this.evaluate(stmt.initializer) : null;
         this.environment.set(stmt.name.lexeme, value);
     }
+    // Handle function declaration
     visitFunctionStmt(stmt) {
         this.environment.set(stmt.name.lexeme, stmt);
     }
+    // Handle block statement
     visitBlockStmt(stmt) {
         for (const statement of stmt.statements) {
             this.execute(statement);
         }
     }
+    // Handle expression statement
     visitExpressionStmt(stmt) {
         this.evaluate(stmt.expression);
     }
+    // Handle return statement
     visitReturnStmt(stmt) {
         const value = stmt.value !== null ? this.evaluate(stmt.value) : null;
         throw new ReturnValue(value);
     }
+    // Handle literal expression
     visitLiteralExpr(expr) {
         if (typeof expr.value === 'string' && expr.value.startsWith('"')) {
             return expr.value.slice(1, -1);
@@ -88,6 +101,7 @@ export class Interpreter {
         }
         return expr.value;
     }
+    // Check if string is Devanagari number
     isDevanagariNumber(value) {
         if (value.length === 0)
             return false;
@@ -99,6 +113,7 @@ export class Interpreter {
         }
         return true;
     }
+    // Convert Devanagari digits to number
     devanagariToNumber(value) {
         const devanagariZero = 0x0966;
         let num = 0;
@@ -108,6 +123,7 @@ export class Interpreter {
         }
         return num;
     }
+    // Handle variable expression
     visitVariableExpr(expr) {
         const value = this.environment.get(expr.name.lexeme);
         if (value === undefined) {
@@ -115,6 +131,7 @@ export class Interpreter {
         }
         return value;
     }
+    // Handle function call expression
     visitCallExpr(expr) {
         const func = this.environment.get(expr.callee.name.lexeme);
         if (func === undefined) {
@@ -152,6 +169,7 @@ export class Interpreter {
         this.environment = prevEnvironment;
         return null;
     }
+    // Handle binary expression
     visitBinaryExpr(expr) {
         const left = this.evaluate(expr.left);
         const right = this.evaluate(expr.right);
@@ -183,6 +201,7 @@ export class Interpreter {
                 throw new Error(`Unknown operator: ${expr.operator.kind}`);
         }
     }
+    // Convert value to number
     toNumber(value) {
         if (typeof value === 'number')
             return value;
@@ -214,9 +233,7 @@ export class Interpreter {
         }
         throw new Error(`Cannot convert '${value}' to number`);
     }
-    /*
-     * Evaluate an expression
-     */
+    // Evaluate an expression
     evaluate(expr) {
         return expr.accept(this);
     }

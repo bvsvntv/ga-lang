@@ -22,6 +22,7 @@ export class Parser {
     this.currentPos = 0;
   }
 
+  // Parse all statements
   parse(): Stmt[] {
     const stmts: Stmt[] = [];
     while (!this.isAtEnd()) {
@@ -35,6 +36,7 @@ export class Parser {
     return stmts;
   }
 
+  // Parse a single statement
   private parseStmt(): Stmt {
     if (this.match(TokenKind.Print)) {
       return this.parsePrintStmt();
@@ -55,6 +57,7 @@ export class Parser {
     return this.parseExpressionStmt();
   }
 
+  // Parse return statement
   private parseReturnStmt(): ReturnStmt {
     let value: Expr | null = null;
     // Check if there's a value to return (not just "फिर्ता" alone)
@@ -64,11 +67,13 @@ export class Parser {
     return new ReturnStmt(value);
   }
 
+  // Parse expression statement
   private parseExpressionStmt(): ExpressionStmt {
     const expr = this.parseExpression();
     return new ExpressionStmt(expr);
   }
 
+  // Parse print statement
   private parsePrintStmt(): Stmt {
     this.consume(TokenKind.OpenParen, "Expect '(' after 'छाप'");
     const expr = this.parseExpression();
@@ -76,6 +81,7 @@ export class Parser {
     return new PrintStmt(expr);
   }
 
+  // Parse variable statement
   private parseVarStmt(): VarStmt {
     const name = this.consume(
       TokenKind.Identifier,
@@ -90,6 +96,7 @@ export class Parser {
     return new VarStmt(name, initializer);
   }
 
+  // Parse function statement
   private parseFunctionStmt(): FunctionStmt {
     const name = this.consume(
       TokenKind.Identifier,
@@ -114,6 +121,7 @@ export class Parser {
     return new FunctionStmt(name, params, body);
   }
 
+  // Parse block of statements
   private parseBlock(): Stmt[] {
     const statements: Stmt[] = [];
 
@@ -125,10 +133,12 @@ export class Parser {
     return statements;
   }
 
+  // Parse expression
   private parseExpression(): Expr {
     return this.parseAddition();
   }
 
+  // Parse addition and subtraction
   private parseAddition(): Expr {
     let expr = this.parseMultiplication();
 
@@ -141,6 +151,7 @@ export class Parser {
     return expr;
   }
 
+  // Parse multiplication, division, and modulo
   private parseMultiplication(): Expr {
     let expr = this.parseCall();
 
@@ -153,6 +164,7 @@ export class Parser {
     return expr;
   }
 
+  // Parse function calls
   private parseCall(): Expr {
     let expr = this.parsePrimary();
 
@@ -175,6 +187,7 @@ export class Parser {
     return expr;
   }
 
+  // Parse primary expressions
   private parsePrimary(): Expr {
     if (this.match(TokenKind.String, TokenKind.Number)) {
       return new LiteralExpr(this.previous().lexeme);
@@ -193,6 +206,7 @@ export class Parser {
     throw this.error(this.peek(), 'Expression expected.');
   }
 
+  // Match and consume token if it matches any of the kinds
   private match(...kinds: TokenKind[]): boolean {
     for (const kind of kinds) {
       if (this.check(kind)) {
@@ -203,33 +217,40 @@ export class Parser {
     return false;
   }
 
+  // Consume expected token or throw error
   private consume(kind: TokenKind, message: string): Token {
     if (this.check(kind)) return this.advance();
     throw this.error(this.peek(), message);
   }
 
+  // Check if current token matches kind
   private check(kind: TokenKind): boolean {
     if (this.isAtEnd()) return false;
     return this.peek().kind === kind;
   }
 
+  // Advance to next token
   private advance(): Token {
     if (!this.isAtEnd()) this.currentPos++;
     return this.previous();
   }
 
+  // Peek at current token
   private peek(): Token {
     return this.tokens[this.currentPos]!;
   }
 
+  // Get previous token
   private previous(): Token {
     return this.tokens[this.currentPos - 1]!;
   }
 
+  // Check if at end of input
   private isAtEnd(): boolean {
     return this.peek().kind === TokenKind.Eof;
   }
 
+  // Create error with message
   private error(token: Token, message: string): Error {
     return new Error(`> [line ${token.line}] Error: ${message}`);
   }

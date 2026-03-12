@@ -5,6 +5,7 @@ export class Lexer {
     startPos;
     currentPos;
     line;
+    // Initialize lexer with source
     constructor(source) {
         this.source = source;
         this.tokens = [];
@@ -12,9 +13,7 @@ export class Lexer {
         this.currentPos = 0;
         this.line = 1;
     }
-    /**
-     * Read tokens from source
-     */
+    // Read all tokens from source
     readTokens() {
         while (!this.isAtEnd()) {
             this.startPos = this.currentPos;
@@ -23,9 +22,7 @@ export class Lexer {
         this.tokens.push(new Token(TokenKind.Eof, '', this.line));
         return this.tokens;
     }
-    /**
-     * Read individual lexeme
-     */
+    // Read single token
     readToken() {
         const char = this.readChar();
         switch (char) {
@@ -100,79 +97,54 @@ export class Lexer {
                 break;
         }
     }
-    /**
-     * Read character
-     */
+    // Read next character from source
     readChar() {
         if (this.isAtEnd())
             return '\0';
         return this.source.charAt(this.currentPos++);
     }
-    /**
-     * Create token out of individual lexeme
-     * @param {TokenKind} kind
-     * @param {any} literal
-     */
+    // Create token from current lexeme
     createToken(kind, literal) {
         if (literal === undefined)
             literal = null;
         const text = this.source.substring(this.startPos, this.currentPos);
         this.tokens.push(new Token(kind, text, this.line));
     }
-    /**
-     * Check if we've reached the end of file
-     */
+    // Check if at end of source
     isAtEnd() {
         return this.currentPos >= this.source.length;
     }
-    /**
-     * Peek next character
-     */
+    // Peek at next character
     peekNextChar() {
         if (this.isAtEnd())
             return '\0';
         return this.source.charAt(this.currentPos);
     }
-    /**
-     * Get next character
-     */
+    // Get and advance to next character
     getNextChar() {
         return this.source.charAt(this.currentPos++);
     }
-    /**
-     * Check if the character is devanagari character
-     * @param {string} char
-     */
+    // Check if character is Devanagari
     isDevnagariChar(char) {
         return (('\u{0900}' <= char && char <= '\u{097F}') ||
             ('\u{A8E0}' <= char && char <= '\u{A8FF}'));
     }
-    /**
-     * Check if the character is devanagari digit
-     * @param {string} char
-     */
+    // Check if character is Devanagari digit
     isDevanagariDigit(char) {
         return '\u{0966}' <= char && char <= '\u{096F}';
     }
-    /**
-     * Check if the character is whitespace
-     * @param {string} char
-     */
+    // Check if character is whitespace
     isWhitespace(char) {
         return char === ' ' || char === '\r' || char === '\t' || char === '\n';
     }
-    /**
-     * Read devanagari character sequence as number
-     */
+    // Read Devanagari digit sequence
     readDevanagariDigit() {
         while (this.isDevanagariDigit(this.peekNextChar()))
             this.getNextChar();
         const literal = this.source.substring(this.startPos, this.currentPos);
         this.createToken(TokenKind.Number, literal);
     }
-    /**
-     * Read devanagari character sequence as identifier
-     */
+    // Read Devanagari identifier
     readDevanagariIdentifier() {
         while (this.isDevnagariChar(this.peekNextChar()))
             this.getNextChar();
@@ -183,9 +155,7 @@ export class Lexer {
         else
             this.createToken(TokenKind.Identifier, literal);
     }
-    /**
-     * Read string literals
-     */
+    // Read string literal
     readDevanagariString() {
         while (this.peekNextChar() != '"' && !this.isAtEnd()) {
             if (this.peekNextChar() === '\n')

@@ -3,6 +3,7 @@ import { Lexer } from './lexer.js';
 import { Parser } from './parser.js';
 import { Interpreter } from './interpreter.js';
 
+// Get filename from command line arguments
 function getFileNameFromArgs(args: string[]): string | null {
   if (args.length <= 0) {
     console.log('> No input files.');
@@ -28,6 +29,7 @@ function execFile(path: string): void {
   interpreter.interpret(stmts);
 }
 
+// Main entry point
 function main(): void {
   const fileName = getFileNameFromArgs(process.argv.slice(2));
   if (fileName !== null) {

@@ -7,6 +7,7 @@ export class Lexer {
   private currentPos: number;
   private line: number;
 
+  // Initialize lexer with source
   constructor(source: string) {
     this.source = source;
     this.tokens = [];
@@ -15,9 +16,7 @@ export class Lexer {
     this.line = 1;
   }
 
-  /**
-   * Read tokens from source
-   */
+  // Read all tokens from source
   readTokens(): Token[] {
     while (!this.isAtEnd()) {
       this.startPos = this.currentPos;
@@ -28,9 +27,7 @@ export class Lexer {
     return this.tokens;
   }
 
-  /**
-   * Read individual lexeme
-   */
+  // Read single token
   readToken(): void {
     const char = this.readChar();
 
@@ -107,51 +104,36 @@ export class Lexer {
     }
   }
 
-  /**
-   * Read character
-   */
+  // Read next character from source
   readChar(): string {
     if (this.isAtEnd()) return '\0';
     return this.source.charAt(this.currentPos++);
   }
 
-  /**
-   * Create token out of individual lexeme
-   * @param {TokenKind} kind
-   * @param {any} literal
-   */
+  // Create token from current lexeme
   createToken(kind: TokenKind, literal?: any): void {
     if (literal === undefined) literal = null;
     const text = this.source.substring(this.startPos, this.currentPos);
     this.tokens.push(new Token(kind, text, this.line));
   }
 
-  /**
-   * Check if we've reached the end of file
-   */
+  // Check if at end of source
   private isAtEnd(): boolean {
     return this.currentPos >= this.source.length;
   }
 
-  /**
-   * Peek next character
-   */
+  // Peek at next character
   private peekNextChar(): string {
     if (this.isAtEnd()) return '\0';
     return this.source.charAt(this.currentPos);
   }
 
-  /**
-   * Get next character
-   */
+  // Get and advance to next character
   private getNextChar(): string {
     return this.source.charAt(this.currentPos++);
   }
 
-  /**
-   * Check if the character is devanagari character
-   * @param {string} char
-   */
+  // Check if character is Devanagari
   private isDevnagariChar(char: string): boolean {
     return (
       ('\u{0900}' <= char && char <= '\u{097F}') ||
@@ -159,25 +141,17 @@ export class Lexer {
     );
   }
 
-  /**
-   * Check if the character is devanagari digit
-   * @param {string} char
-   */
+  // Check if character is Devanagari digit
   private isDevanagariDigit(char: string): boolean {
     return '\u{0966}' <= char && char <= '\u{096F}';
   }
 
-  /**
-   * Check if the character is whitespace
-   * @param {string} char
-   */
+  // Check if character is whitespace
   private isWhitespace(char: string): boolean {
     return char === ' ' || char === '\r' || char === '\t' || char === '\n';
   }
 
-  /**
-   * Read devanagari character sequence as number
-   */
+  // Read Devanagari digit sequence
   private readDevanagariDigit(): void {
     while (this.isDevanagariDigit(this.peekNextChar())) this.getNextChar();
     const literal = this.source.substring(this.startPos, this.currentPos);
@@ -185,9 +159,7 @@ export class Lexer {
     this.createToken(TokenKind.Number, literal);
   }
 
-  /**
-   * Read devanagari character sequence as identifier
-   */
+  // Read Devanagari identifier
   private readDevanagariIdentifier(): void {
     while (this.isDevnagariChar(this.peekNextChar())) this.getNextChar();
     const literal = this.source.substring(this.startPos, this.currentPos);
@@ -197,9 +169,7 @@ export class Lexer {
     else this.createToken(TokenKind.Identifier, literal);
   }
 
-  /**
-   * Read string literals
-   */
+  // Read string literal
   private readDevanagariString(): void {
     while (this.peekNextChar() != '"' && !this.isAtEnd()) {
       if (this.peekNextChar() === '\n') this.line++;

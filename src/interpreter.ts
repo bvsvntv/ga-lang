@@ -28,7 +28,10 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
   private environment: Map<string, any> = new Map();
   private outputs: string[] = [];
 
-  // CLI entry
+  /**
+   * CLI entry
+   *
+   */
   interpret(statements: Stmt[]): void {
     this.outputs = [];
     this.run(statements);
@@ -54,16 +57,19 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     this.outputs.push(output);
   }
 
+  // Run statements
   private run(statements: Stmt[]): void {
     for (const statement of statements) {
       this.execute(statement);
     }
   }
 
+  // Execute a statement
   private execute(stmt: Stmt): void {
     stmt.accept(this);
   }
 
+  // Convert value to Devanagari string
   private toDevanagariString(value: any): string {
     if (typeof value === 'number') {
       return this.numberToDevanagari(value);
@@ -71,6 +77,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     return String(value);
   }
 
+  // Convert number to Devanagari digits
   private numberToDevanagari(num: number): string {
     const devanagariZero = 0x0966;
     return num
@@ -85,31 +92,37 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
       .join('');
   }
 
+  // Handle variable statement
   visitVarStmt(stmt: VarStmt): void {
     const value =
       stmt.initializer !== null ? this.evaluate(stmt.initializer) : null;
     this.environment.set(stmt.name.lexeme, value);
   }
 
+  // Handle function declaration
   visitFunctionStmt(stmt: FunctionStmt): void {
     this.environment.set(stmt.name.lexeme, stmt);
   }
 
+  // Handle block statement
   visitBlockStmt(stmt: BlockStmt): void {
     for (const statement of stmt.statements) {
       this.execute(statement);
     }
   }
 
+  // Handle expression statement
   visitExpressionStmt(stmt: ExpressionStmt): void {
     this.evaluate(stmt.expression);
   }
 
+  // Handle return statement
   visitReturnStmt(stmt: ReturnStmt): void {
     const value = stmt.value !== null ? this.evaluate(stmt.value) : null;
     throw new ReturnValue(value);
   }
 
+  // Handle literal expression
   visitLiteralExpr(expr: LiteralExpr): any {
     if (typeof expr.value === 'string' && expr.value.startsWith('"')) {
       return expr.value.slice(1, -1);
@@ -123,6 +136,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     return expr.value;
   }
 
+  // Check if string is Devanagari number
   private isDevanagariNumber(value: string): boolean {
     if (value.length === 0) return false;
     for (const char of value) {
@@ -134,6 +148,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     return true;
   }
 
+  // Convert Devanagari digits to number
   private devanagariToNumber(value: string): number {
     const devanagariZero = 0x0966;
     let num = 0;
@@ -144,6 +159,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     return num;
   }
 
+  // Handle variable expression
   visitVariableExpr(expr: VariableExpr): any {
     const value = this.environment.get(expr.name.lexeme);
     if (value === undefined) {
@@ -152,6 +168,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     return value;
   }
 
+  // Handle function call expression
   visitCallExpr(expr: CallExpr): any {
     const func = this.environment.get(expr.callee.name.lexeme);
     if (func === undefined) {
@@ -197,6 +214,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     return null;
   }
 
+  // Handle binary expression
   visitBinaryExpr(expr: BinaryExpr): any {
     const left = this.evaluate(expr.left);
     const right = this.evaluate(expr.right);
@@ -231,6 +249,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     }
   }
 
+  // Convert value to number
   private toNumber(value: any): number {
     if (typeof value === 'number') return value;
     if (typeof value === 'string') {
@@ -259,9 +278,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     throw new Error(`Cannot convert '${value}' to number`);
   }
 
-  /*
-   * Evaluate an expression
-   */
+  // Evaluate an expression
   private evaluate(expr: Expr): any {
     return expr.accept(this);
   }
