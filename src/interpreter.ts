@@ -28,10 +28,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
   private environment: Map<string, any> = new Map();
   private outputs: string[] = [];
 
-  /**
-   * CLI entry
-   *
-   */
+  // CLI entry - executes and prints result in console
   interpret(statements: Stmt[]): void {
     this.outputs = [];
     this.run(statements);
@@ -41,16 +38,14 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     }
   }
 
-  // Browser entry
+  // Browser entry - returns result as string
   interpretForBrowser(statements: Stmt[]): string {
     this.outputs = [];
     this.run(statements);
     return this.outputs.join('\n');
   }
 
-  /*
-   * Process print statement
-   */
+  // Process print statement
   visitPrintStmt(stmt: PrintStmt): void {
     const value = this.evaluate(stmt.expression);
     const output = this.toDevanagariString(value);
